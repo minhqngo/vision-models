@@ -7,12 +7,15 @@ from tqdm import tqdm
 from datetime import datetime
 
 from tiny_imagenet_dataset import tiny_imagenet_loader
-from models import create_model
+from torch_dataset_factory import torch_dataset_factory
+from models import create_model, model_summary
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--arch', type=str, default='mobilenet_v3_large')
+    parser.add_argument('--ds-name', type=str, default='tiny-imagenet', 
+                        choices=['tiny-imagenet', 'cifar10', 'cifar100', 'svhn'])
     parser.add_argument('--ds-dir', type=str, default=None)
     parser.add_argument('--bs', type=int, default=32)
     parser.add_argument('--device', type=int, default=0)
@@ -20,11 +23,15 @@ if __name__ == '__main__':
     parser.add_argument('--lr', type=float, default=1e-3)
     args = parser.parse_args()
 
-    train_loader, val_loader, n_classes = tiny_imagenet_loader(args.ds_dir, args.bs)
+    if args.ds_name == 'tiny-imagenet':
+        train_loader, val_loader, n_classes = tiny_imagenet_loader(args.ds_dir, args.bs)
+    else:
+        train_loader, val_loader, n_classes = torch_dataset_factory(args.ds_name, args.ds_dir, args.bs)
+    
     model = create_model(args.arch, n_classes=n_classes)
-
     device = torch.device(f"cuda:{args.device}" if torch.cuda.is_available() else "cpu" and args.device != -1)
     model.to(device)
+    model_summary(model)
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.AdamW(model.parameters(), lr=args.lr)
