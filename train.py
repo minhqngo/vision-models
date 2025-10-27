@@ -6,8 +6,7 @@ from torch import optim, nn
 from tqdm import tqdm
 from datetime import datetime
 
-from tiny_imagenet_dataset import tiny_imagenet_loader
-from torch_dataset_factory import torch_dataset_factory
+from dataset_utils import torch_dataset_factory, tiny_imagenet_loader
 from models import create_model, model_summary
 
 

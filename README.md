@@ -1,0 +1,1 @@
+Implementations of miniaturized variants of popular vision encoders in PyTorch. Work in progress.
